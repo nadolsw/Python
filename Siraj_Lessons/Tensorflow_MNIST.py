@@ -1,5 +1,5 @@
-#Based on Siraj's 'Tensorflow in 5 Minutes' youtube video
-#Uses TF to build neural network that classifies hand written digits from MNIST dataset
+#Based on Siraj's 'Tensorflow in 5 Minutes' youtube video: https://www.youtube.com/watch?v=2FmcHiLCwTU&vl=en #
+#Uses TF to build neural network that classifies hand written digits from MNIST dataset#
 import tensorflow as tf
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
