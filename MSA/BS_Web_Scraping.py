@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+###This project scrapes the AccuWeather webpage in order to collect weather data on selected cities###
+
 #libraries
 import bs4
 from bs4 import BeautifulSoup
