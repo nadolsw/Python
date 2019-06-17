@@ -1,0 +1,50 @@
+
+/*Demo of SAS proc spectra capabilities based upon: http://support.sas.com/documentation/cdl/en/etsug/60372/HTML/default/viewer.htm#etsug_spectra_sect020.htm*/
+/*Data can be found here: http://www.sidc.be/silso/datafiles#total*/
+
+/*location of sunspot.csv file*/
+%let dsin=C:\Users\winado\Desktop\Python\UCIHAR\sunspot.csv;
+
+/*Import Data*/
+proc import datafile="&dsin" out=sunspot replace;
+run;
+
+ods graphics on / imagemap;
+ods tagsets.sasreport13(ID=EGSR) gtitle;
+
+/*Plot Data*/
+proc sgplot data=sunspot;
+  title "Sunspot Activity Over Time";
+  series x=year y=wolfer / markers markerattrs=(symbol=circlefilled);
+  xaxis values=(1700 to 2000 by 25);
+  yaxis label="Wolf Relative Sunspot Number";
+run;
+
+/*Perform FFT to Extract Fourier & PSD Coefficients*/
+proc spectra data=sunspot out=b s adjmean whitetest;
+  var wolfer;
+  weights 1 2 3 4 3 2 1; /*Smoothing weights*/
+run;
+
+/*Plot the Power Spectral Density (PSD) of each series*/
+proc sgplot data=b;
+  title "Power Spectral Density in Frequency Domain";
+  series x=freq y=s_01 / markers markerattrs=(symbol=circlefilled);
+run;
+proc sgplot data=b;
+  title "Power Spectral Density in Period (1/F) Domain";
+  series x=period y=s_01 / markers markerattrs=(symbol=circlefilled);
+run;
+
+/*Identify the period (frequency) associated with greatest power*/
+proc sql noprint;
+	select period into: predominant_period
+	from b having s_01 eq max(s_01);
+quit;
+
+proc sgplot data=b;
+  title "PSD of Most Dominant Frequency (P=%sysfunc(cats(&predominant_period.)) Years)";
+  series x=period y=s_01 / markers markerattrs=(symbol=circlefilled);
+  where period < 50;
+  refline &predominant_period. / axis=x;
+run;
